@@ -6,40 +6,40 @@ import threading
 class MyCache():
 
     def __init__(self):
-        self._cache = {}
-        self._cache_time = {}
-        x = threading.Thread(target=self._watch, args=(), daemon=True)
-        x.start()
+        self.cache = {}
+        self.cache_time = {}
+        self.__watch_thread = threading.Thread(target=self.__watch, args=(), daemon=True)
+        self.__watch_thread.start()
 
-    def _watch(self):
+    def __watch(self):
             try:
                 current_time = time.time()
-                for i in self._cache.keys():
-                    if current_time > self._cache_time[i][0] + self._cache_time[i][1]:
-                        self._cache.pop(i)
-                        self._cache_time.pop(i)
+                for i in self.cache.keys():
+                    if current_time > self.cache_time[i][0] + self.cache_time[i][1]:
+                        self.cache.pop(i)
+                        self.cache_time.pop(i)
             except: 'Cache changed!'
             time.sleep(0.8)
-            self._watch()
+            self.__watch()
 
     def set_item(self, key, value, ttl=None):  
-        self._cache[key] = value
+        self.cache[key] = value
         if ttl is not None:
             creation_time = time.time()
-            self._cache_time[key] = [creation_time, ttl]
+            self.cache_time[key] = [creation_time, ttl]
 
     def get_item(self, key):
-        if key in self._cache.keys():
-            return self._cache[key]
-            print(self._cache[key])
+        if key in self.cache.keys():
+            return self.cache[key]
+            print(self.cache[key])
         else:
             return 'No such key!'
 
     def del_item(self, key):
-        if key in self._cache.keys():
-            self._cache.pop(key)
-            if key in self._cache_time.keys():
-                self._cache_time.pop(key)
+        if key in self.cache.keys():
+            self.cache.pop(key)
+            if key in self.cache_time.keys():
+                self.cache_time.pop(key)
             return 'Deleted!'
         else:
             return 'No such key!'
@@ -47,7 +47,7 @@ class MyCache():
     def keys(self, pattern):
         result = []
         try:
-            for i in self._cache.keys():
+            for i in self.cache.keys():
                 if re.findall(pattern, str(i)) != []:
                     result.append(i)
         except: 'Cache changed!'
